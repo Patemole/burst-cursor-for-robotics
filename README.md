@@ -1,7 +1,12 @@
+![Burst Logo](assets/Burst.png)
 # Burst: Robotics RL Pipeline
+
 
 ## Overview
 Burst is a modular, containerized reinforcement learning pipeline for robotics. It enables fast, reproducible training of RL agents (PPO, SAC, etc.), experiment tracking, and easy deployment. The system is designed for both local and cloud (GPU) execution, and includes a backend service for future API/UI integration.
+
+![Burst Logo](assets/Burst.png)
+
 
 ## Value Proposition
 - One-command setup for parallel RL training and experiment tracking
