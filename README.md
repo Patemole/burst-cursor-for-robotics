@@ -5,7 +5,7 @@
 ## Overview
 Burst is a modular, containerized reinforcement learning pipeline for robotics. It enables fast, reproducible training of RL agents (PPO, SAC, etc.), experiment tracking, and easy deployment. The system is designed for both local and cloud (GPU) execution, and includes a backend service for future API/UI integration.
 
-![Burst output video](rl-video-episode-57000.gif)
+![Burst output video](assets/rl-video-episode-57000.gif)
 
 <img src="assets/tensorboard.png" alt="Tensorboard" width="250"/>
 
