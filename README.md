@@ -1,28 +1,27 @@
 # Burst: Robotics RL Pipeline
 
 ## Overview
-Burst is a modular reinforcement learning pipeline for robotics. It enables fast iteration, reproducible training, and easy deployment of RL agents. The project is containerized (Docker Compose) and supports both local and remote (GPU) execution. The backend service is included for future API or UI integration.
+Burst is a modular, containerized reinforcement learning pipeline for robotics. It enables fast, reproducible training of RL agents (PPO, SAC, etc.), experiment tracking, and easy deployment. The system is designed for both local and cloud (GPU) execution, and includes a backend service for future API/UI integration.
 
 ## Value Proposition
-- One-command setup for RL training and experiment tracking
+- One-command setup for parallel RL training and experiment tracking
+- Supports multiple RL algorithms (PPO, SAC, extensible)
 - GPU-ready, cloud-friendly (EC2, GCP, etc.)
-- Modular: backend and trainer run as separate services
+- Modular: backend and multiple trainers run as separate services
 - Results and logs are easy to access and download
 
 ---
 
-## Quickstart (Local)
+## Quickstart (Local, with Docker Compose)
 
 ### 1. Build and start all services
 ```bash
 docker compose build
-```
-```bash
 docker compose up
 ```
-
-- `trainer`: runs RL training, writes logs and outputs
-- `backend`: placeholder for API/UI (runs on port 8000)
+- `trainer-ppo`: runs PPO RL training, writes logs and outputs
+- `trainer-sac`: runs SAC RL training, writes logs and outputs
+- `api`: backend service (runs on port 8000)
 - `tensorboard`: available at http://localhost:6006/
 
 ### 2. Stop all services
@@ -32,7 +31,8 @@ docker compose down
 
 ### 3. View logs
 ```bash
-docker compose logs -f trainer
+docker compose logs -f trainer-ppo
+docker compose logs -f trainer-sac
 ```
 
 ---
@@ -63,7 +63,6 @@ cd burst-cursor-for-robotics
 docker compose --profile gpu build
 docker compose --profile gpu up
 ```
-
 - Access TensorBoard at http://<EC2-IP>:6006/
 - Backend API at http://<EC2-IP>:8000/
 
@@ -80,8 +79,8 @@ scp -i <key.pem> -r ubuntu@<EC2-IP>:~/burst-cursor-for-robotics/tensorboard_logs
 ---
 
 ## Expected Outputs
-- Trained model: `output/policy.onnx`
-- Videos: `output/videos/`
+- Trained models: `output/ppo/policy.onnx`, `output/sac/policy.onnx`
+- Videos: `output/ppo/videos/`, `output/sac/videos/`
 - TensorBoard logs: `tensorboard_logs/`
 
 ---
@@ -94,10 +93,11 @@ scp -i <key.pem> -r ubuntu@<EC2-IP>:~/burst-cursor-for-robotics/tensorboard_logs
 ---
 
 ## Project Structure
-- `trainer/` : RL training logic
-- `backend/` : API/UI service (placeholder)
-- `output/` : trained models, videos
+- `train.py`, `train_sac.py` : RL training entrypoints (PPO/SAC)
+- `api/` : backend service (FastAPI, placeholder)
+- `output/ppo/`, `output/sac/` : trained models, videos
 - `tensorboard_logs/` : logs for TensorBoard
+- `docker-compose.yml` : service orchestration
 
 ---
 
