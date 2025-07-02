@@ -7,7 +7,7 @@ Burst is a modular, containerized reinforcement learning pipeline for robotics. 
 
 ![Burst output video](assets/rl-video-episode-57000.gif)
 
-![Burst output video](assets/assets/tensorboard.png)
+![Burst output video](assets/tensorboard.png)
 
 ## Value Proposition
 - One-command setup for parallel RL training and experiment tracking
