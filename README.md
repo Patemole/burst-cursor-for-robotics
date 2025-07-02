@@ -1,107 +1,104 @@
-# Burst - the cursor for robotics
+# Burst: Robotics RL Pipeline
 
+## Overview
+Burst is a modular reinforcement learning pipeline for robotics. It enables fast iteration, reproducible training, and easy deployment of RL agents. The project is containerized (Docker Compose) and supports both local and remote (GPU) execution. The backend service is included for future API or UI integration.
 
-
-To see metrics
-tensorboard --logdir tensorboard_logs/
-
-
-Voici un **récapitulatif complet** des commandes à exécuter, étape par étape, pour configurer ton serveur EC2 GPU, transférer ton projet, lancer l'entraînement, et récupérer les résultats ✅
+## Value Proposition
+- One-command setup for RL training and experiment tracking
+- GPU-ready, cloud-friendly (EC2, GCP, etc.)
+- Modular: backend and trainer run as separate services
+- Results and logs are easy to access and download
 
 ---
 
-## 🧱 1. Connexion SSH à ton serveur EC2
+## Quickstart (Local)
 
+### 1. Build and start all services
 ```bash
-ssh -i ~/Desktop/burst-humanoide-key.pem ubuntu@18.226.163.192
+docker compose build
+```
+```bash
+docker compose up
+```
+
+- `trainer`: runs RL training, writes logs and outputs
+- `backend`: placeholder for API/UI (runs on port 8000)
+- `tensorboard`: available at http://localhost:6006/
+
+### 2. Stop all services
+```bash
+docker compose down
+```
+
+### 3. View logs
+```bash
+docker compose logs -f trainer
 ```
 
 ---
 
-## 🐍 2. Activer l’environnement PyTorch fourni par l’AMI AWS
+## Running on a Remote GPU Server (e.g. EC2)
 
+1. SSH into your instance:
 ```bash
-source /opt/pytorch/bin/activate
+ssh -i <key.pem> ubuntu@<EC2-IP>
 ```
-
----
-
-## 🐳 3. Installer Docker (si ce n'est pas déjà fait)
-
+2. Install Docker & Docker Compose:
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
 sudo usermod -aG docker $USER
+exit # then reconnect
 ```
-
-> 🔁 **Puis reconnecte-toi au SSH** pour appliquer les droits :
-
+3. Install NVIDIA Container Toolkit (for GPU):
 ```bash
-exit
-# Puis reconnecte :
-ssh -i ~/Desktop/burst-humanoide-key.pem ubuntu@18.226.163.192
+# See https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
 ```
-
----
-
-## 📂 4. Transférer ton projet depuis ton Mac
-
+4. Copy project from your local machine:
 ```bash
-scp -i ~/Desktop/burst-humanoide-key.pem -r ~/burst-cursor-for-robotics ubuntu@18.226.163.192:~/
+scp -i <key.pem> -r ~/burst-cursor-for-robotics ubuntu@<EC2-IP>:~/
 ```
-
----
-
-## 🐳 5. Builder ton image Docker
-
+5. Build and start:
 ```bash
-cd ~/burst-cursor-for-robotics
-docker build --no-cache -t burst-mvp-1 .
+cd burst-cursor-for-robotics
+docker compose --profile gpu build
+docker compose --profile gpu up
 ```
+
+- Access TensorBoard at http://<EC2-IP>:6006/
+- Backend API at http://<EC2-IP>:8000/
 
 ---
 
-## 🚀 6. Lancer l'entraînement dans le conteneur Docker
+## Download Results
 
+From your local machine:
 ```bash
-docker run --rm -it --gpus all -p 6006:6006 \
-  -v "$(pwd)/output:/app/output" \
-  -v "$(pwd)/tensorboard_logs:/app/tensorboard_logs" \
-  burst-mvp-1
+scp -i <key.pem> -r ubuntu@<EC2-IP>:~/burst-cursor-for-robotics/output ./
+scp -i <key.pem> -r ubuntu@<EC2-IP>:~/burst-cursor-for-robotics/tensorboard_logs ./
 ```
 
 ---
 
-## 📊 7. Visualiser TensorBoard dans le navigateur
-
-Depuis ton Mac :
-
-```
-http://18.226.163.192:6006/
-```
+## Expected Outputs
+- Trained model: `output/policy.onnx`
+- Videos: `output/videos/`
+- TensorBoard logs: `tensorboard_logs/`
 
 ---
 
-## ⬇️ 8. Télécharger les résultats (vidéos, modèle, logs)
-
-Sur **ton Mac** :
-
-```bash
-scp -i ~/Desktop/burst-humanoide-key.pem -r \
-    ubuntu@18.226.163.192:~/burst-cursor-for-robotics/output ~/Desktop/
-
-scp -i ~/Desktop/burst-humanoide-key.pem -r \
-    ubuntu@18.226.163.192:~/burst-cursor-for-robotics/tensorboard_logs ~/Desktop/
-```
+## Troubleshooting
+- If you get GPU errors, check NVIDIA drivers and container toolkit
+- If ports are busy, change them in `docker-compose.yml`
+- To iterate: edit code, rebuild (`docker compose build`), and restart (`docker compose up`)
 
 ---
 
-## ✅ Résultat attendu
-
-* Le modèle exporté est dans : `output/policy.onnx`
-* Les vidéos sont dans : `output/dossiers/videos/`
-* TensorBoard est accessible via IP:6006
-* Tu peux itérer facilement sur les modifs de ton code et rebuilder + relancer
+## Project Structure
+- `trainer/` : RL training logic
+- `backend/` : API/UI service (placeholder)
+- `output/` : trained models, videos
+- `tensorboard_logs/` : logs for TensorBoard
 
 ---
 
-Tu veux que je t’écrive tout ça en script `.sh` pour automatiser ?
+For automation, consider writing a Makefile or shell script for common workflows.

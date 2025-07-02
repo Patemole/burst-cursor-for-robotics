@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./api
+    ports:
+      - "8000:8000"
+    restart: always
+
+  trainer:
+    build:
+      context: .
+    volumes:
+      - ./output:/app/output
+      - ./tensorboard_logs:/app/tensorboard_logs
+    ports:
+      - "6006:6006"
+    #deploy:
+    # resources:
+    #    reservations:
+    #     devices:
+    #        - capabilities: [gpu]
+    stdin_open: true
+    tty: true
